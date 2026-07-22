@@ -481,3 +481,169 @@ Windows PowerShell:
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.
+--- a/README.md
+++ b/README.md
+@@
+ | Provider | Admin UI setting | Example `MODEL` |
+ |----------|------------------|-----------------|
+ | [NVIDIA NIM](https://build.nvidia.com/settings/api-keys) | `NVIDIA_NIM_API_KEY` | `nvidia_nim/nvidia/nemotron-3-super-120b-a12b` |
+ | [OpenRouter](https://openrouter.ai/keys) | `OPENROUTER_API_KEY` | `open_router/openrouter/free` |
+ | [Google AI Studio (Gemini)](https://aistudio.google.com/apikey) | `GEMINI_API_KEY` | `gemini/models/gemini-3.1-flash-lite` |
+ | [Google Vertex AI](https://cloud.google.com/vertex-ai/generative-ai/docs/start/openai) | `VERTEX_PROJECT_ID` + ADC | `vertex/google/gemini-3.5-flash` |
+ | [DeepSeek](https://platform.deepseek.com/api_keys) | `DEEPSEEK_API_KEY` | `deepseek/deepseek-chat` |
+ | [Mistral La Plateforme](https://console.mistral.ai/) | `MISTRAL_API_KEY` | `mistral/devstral-small-latest` |
+ | [Mistral Codestral](https://console.mistral.ai/) | `CODESTRAL_API_KEY` | `mistral_codestral/codestral-latest` |
+ | [OpenCode Zen](https://opencode.ai/auth) | `OPENCODE_API_KEY` | `opencode/gpt-5.3-codex` |
+ | [OpenCode Go](https://opencode.ai/auth) | `OPENCODE_API_KEY` | `opencgo/minimax-m2.7` |
+ | [Vercel AI Gateway](https://vercel.com/docs/ai-gateway/models-and-providers) | `AI_GATEWAY_API_KEY` | `vercel/openai/gpt-5.5` |
+ | [Amazon Bedrock](https://console.aws.amazon.com/bedrock/) | `AWS_BEARER_TOKEN_BEDROCK` | `bedrock/openai.gpt-oss-120b` |
+ | [Hugging Face Inference Providers](https://huggingface.co/settings/tokens) | `HUGGINGFACE_API_KEY` | `huggingface/Qwen/Qwen3-Coder-480B-A35B-Instruct:fastest` |
+ | [Cohere](https://dashboard.cohere.com/api-keys) | `COHERE_API_KEY` | `cohere/command-a-plus-05-2026` |
+ | [GitHub Models](https://github.com/marketplace?type=models) | `GITHUB_MODELS_TOKEN` | `github_models/openai/gpt-4.1` |
+ | [Wafer](https://wafer.ai/) | `WAFER_API_KEY` | `wafer/DeepSeek-V4-Pro` |
+ | [Kimi API](https://platform.moonshot.ai/console/api-keys) | `KIMI_API_KEY` | `kimi/kimi-k2.5` |
+ | [Kimi Code](https://www.kimi.com/code/console) | `KIMI_CODE_API_KEY` | `kimo_code/k3` |
+ | [MiniMax](https://platform.minimax.io/user-center/basic-information/interface-key) | `MINIMAX_API_KEY` | `minimax/MiniMax-M3` |
+ | [Cerebras Inference](https://cloud.cerebras.ai/) | `CEREBRAS_API_KEY` | `cerebras/gpt-oss-120b` |
+ | [Groq](https://console.groq.com/keys) | `GROQ_API_KEY` | `groq/llama-3.3-70b-versatile` |
+ | [SambaNova](https://cloud.sambanova.ai/apis) | `SAMBANOVA_API_KEY` | `sambanova/Meta-Llama-3.3-70B-Instruct` |
+ | [Fireworks AI](https://fireworks.ai/account/api-keys) | `FIREWORKS_API_KEY` | `fireworks/accounts/fireworks/models/llama-v3p3-70b-instruct` |
+ | [Cloudflare Workers AI](https://developers.cloudflare.com/workers-ai/) | `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` | `cloudflare/@cf/moonshotai/kimi-k2.6` |
+ | [Z.ai](https://z.ai/manage-apikey/apikey-list) | `ZAI_API_KEY` | `zai/glm-5.2` |
+ | [Ollama Cloud](https://ollama.com/settings/keys) | `OLLAMA_API_KEY` | `ollama_cloud/qwen3-coder:480b` |
+ | [LM Studio](https://lmstudio.ai/) | `LM_STUDIO_BASE_URL` | `lmstudio/` |
+ | [llama.cpp](https://github.com/ggml-org/llama.cpp) | `LLAMACPP_BASE_URL` | `llamacpp/` |
+ | [Ollama](https://ollama.com/) | `OLLAMA_BASE_URL` | `ollama/` |
+
+## Using Free Claude Code (FCC) locally (optional)
+
+FCC is a lightweight proxy that lets you point the Claude Code, Codex, or Pi CLI tools at any OpenAIâ€‘compatible LLM provider (e.g., NVIDIA NIM, OpenRouter, Gemini).
+
+### Oneâ€‘time setup
+```powershell
+# Install the UV tool (once)
+uv tool install --force --refresh-package free-claude-code --git https://github.com/Alishahryar1/free-claude-code.git
+```
+
+### Starting the proxy
+```powershell
+# Clear any env that could interfere (especially when using Hermes)
+$env:VIRTUAL_ENV = $null
+$env:PYTHONPATH  = $null
+
+# Put your provider key here â€“ **never commit this value**
+$env:NVIDIA_NIM_API_KEY="***"   # replace with your actual key
+
+# Launch the server
+uv tool run free-claude-code fcc-server
+```
+The server will listen on `http://127.0.0.1:8082`. Keep this window open while you work.
+
+### Using the wrapped CLIs
+In a **new** terminal (repeat the `unset`/`export` block above, or simply source the same snippet):
+
+```powershell
+$env:VIRTUAL_ENV = $null
+$env:PYTHONPATH  = $null
+$env:NVIDIA_NIM_API_KEY="***"
+$env:PATH = "$HOME/.local\bin;$env:PATH"
+
+# Examples
+fcc-claude "Explain how to reverse a string in Python."
+fcc-codex exec "ls -lt | head -5"
+fcc-pi --help
+```
+
+### Stopping the proxy
+Press **Ctrlâ€¯+C** in the terminal where you ran `uv tool run â€¦`, or from another terminal:
+
+```powershell
+Get-Process | Where-Object {$_.Path -like "*fcc-server.exe"} | Stop-Process -Force
+```
+
+> **âš ï¸ Security note:** Never commit your actual API key. If you prefer not to type it each time, create a `.env` file (added to `.gitignore`) and load it with `dotenv` or a similar method before launching the server.
+
+ ## Important provider notes
+--- a/README.md
+++ b/README.md
+@@
+ | Provider | Admin UI setting | Example `MODEL` |
+ |----------|------------------|-----------------|
+ | [NVIDIA NIM](https://build.nvidia.com/settings/api-keys) | `NVIDIA_NIM_API_KEY` | `nvidia_nim/nvidia/nemotron-3-super-120b-a12b` |
+ | [OpenRouter](https://openrouter.ai/keys) | `OPENROUTER_API_KEY` | `open_router/openrouter/free` |
+ | [Google AI Studio (Gemini)](https://aistudio.google.com/apikey) | `GEMINI_API_KEY` | `gemini/models/gemini-3.1-flash-lite` |
+ | [Google Vertex AI](https://cloud.google.com/vertex-ai/generative-ai/docs/start/openai) | `VERTEX_PROJECT_ID` + ADC | `vertex/google/gemini-3.5-flash` |
+ | [DeepSeek](https://platform.deepseek.com/api_keys) | `DEEPSEEK_API_KEY` | `deepseek/deepseek-chat` |
+ | [Mistral La Plateforme](https://console.mistral.ai/) | `MISTRAL_API_KEY` | `mistral/devstral-small-latest` |
+ | [Mistral Codestral](https://console.mistral.ai/) | `CODESTRAL_API_KEY` | `mistral_codestral/codestral-latest` |
+ | [OpenCode Zen](https://opencode.ai/auth) | `OPENCODE_API_KEY` | `opencode/gpt-5.3-codex` |
+ | [OpenCode Go](https://opencode.ai/auth) | `OPENCODE_API_KEY` | `opencgo/minimax-m2.7` |
+ | [Vercel AI Gateway](https://vercel.com/docs/ai-gateway/models-and-providers) | `AI_GATEWAY_API_KEY` | `vercel/openai/gpt-5.5` |
+ | [Amazon Bedrock](https://console.aws.amazon.com/bedrock/) | `AWS_BEARER_TOKEN_BEDROCK` | `bedrock/openai.gpt-oss-120b` |
+ | [Hugging Face Inference Providers](https://huggingface.co/settings/tokens) | `HUGGINGFACE_API_KEY` | `huggingface/Qwen/Qwen3-Coder-480B-A35B-Instruct:fastest` |
+ | [Cohere](https://dashboard.cohere.com/api-keys) | `COHERE_API_KEY` | `cohere/command-a-plus-05-2026` |
+ | [GitHub Models](https://github.com/marketplace?type=models) | `GITHUB_MODELS_TOKEN` | `github_models/openai/gpt-4.1` |
+ | [Wafer](https://wafer.ai/) | `WAFER_API_KEY` | `wafer/DeepSeek-V4-Pro` |
+ | [Kimi API](https://platform.moonshot.ai/console/api-keys) | `KIMI_API_KEY` | `kimi/kimi-k2.5` |
+ | [Kimi Code](https://www.kimi.com/code/console) | `KIMI_CODE_API_KEY` | `kimo_code/k3` |
+ | [MiniMax](https://platform.minimax.io/user-center/basic-information/interface-key) | `MINIMAX_API_KEY` | `minimax/MiniMax-M3` |
+ | [Cerebras Inference](https://cloud.cerebras.ai/) | `CEREBRAS_API_KEY` | `cerebras/gpt-oss-120b` |
+ | [Groq](https://console.groq.com/keys) | `GROQ_API_KEY` | `groq/llama-3.3-70b-versatile` |
+ | [SambaNova](https://cloud.sambanova.ai/apis) | `SAMBANOVA_API_KEY` | `sambanova/Meta-Llama-3.3-70B-Instruct` |
+ | [Fireworks AI](https://fireworks.ai/account/api-keys) | `FIREWORKS_API_KEY` | `fireworks/accounts/fireworks/models/llama-v3p3-70b-instruct` |
+ | [Cloudflare Workers AI](https://developers.cloudflare.com/workers-ai/) | `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` | `cloudflare/@cf/moonshotai/kimi-k2.6` |
+ | [Z.ai](https://z.ai/manage-apikey/apikey-list) | `ZAI_API_KEY` | `zai/glm-5.2` |
+ | [Ollama Cloud](https://ollama.com/settings/keys) | `OLLAMA_API_KEY` | `ollama_cloud/qwen3-coder:480b` |
+ | [LM Studio](https://lmstudio.ai/) | `LM_STUDIO_BASE_URL` | `lmstudio/` |
+ | [llama.cpp](https://github.com/ggml-org/llama.cpp) | `LLAMACPP_BASE_URL` | `llamacpp/` |
+ | [Ollama](https://ollama.com/) | `OLLAMA_BASE_URL` | `ollama/` |
+
+## Using Free Claude Code (FCC) locally (optional)
+
+FCC is a lightweight proxy that lets you point the Claude Code, Codex, or Pi CLI tools at any OpenAIâ€‘compatible LLM provider (e.g., NVIDIA NIM, OpenRouter, Gemini).
+
+### Oneâ€‘time setup
+```powershell
+# Install the UV tool (once)
+uv tool install --force --refresh-package free-claude-code --git https://github.com/Alishahryar1/free-claude-code.git
+```
+
+### Starting the proxy
+```powershell
+# Clear any env that could interfere (especially when using Hermes)
+$env:VIRTUAL_ENV = $null
+$env:PYTHONPATH  = $null
+
+# Put your provider key here â€“ **never commit this value**
+$env:NVIDIA_NIM_API_KEY="***"   # replace with your actual key
+
+# Launch the server
+uv tool run free-claude-code fcc-server
+```
+The server will listen on `http://127.0.0.1:8082`. Keep this window open while you work.
+
+### Using the wrapped CLIs
+In a **new** terminal (repeat the `unset`/`export` block above, or simply source the same snippet):
+
+```powershell
+$env:VIRTUAL_ENV = $null
+$env:PYTHONPATH  = $null
+$env:NVIDIA_NIM_API_KEY="***"
+$env:PATH = "$HOME/.local\bin;$env:PATH"
+
+# Examples
+fcc-claude "Explain how to reverse a string in Python."
+fcc-codex exec "ls -lt | head -5"
+fcc-pi --help
+```
+
+### Stopping the proxy
+Press **Ctrlâ€¯+C** in the terminal where you ran `uv tool run â€¦`, or from another terminal:
+
+```powershell
+Get-Process | Where-Object {$_.Path -like "*fcc-server.exe"} | Stop-Process -Force
+```
+
+> **âš ï¸ Security note:** Never commit your actual API key. If you prefer not to type it each time, create a `.env` file (added to `.gitignore`) and load it with `dotenv` or a similar method before launching the server.
+
+ ## Important provider notes
